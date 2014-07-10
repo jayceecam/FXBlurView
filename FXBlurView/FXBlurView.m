@@ -50,7 +50,7 @@
 
 @implementation UIImage (FXBlurView)
 
-- (UIImage *)blurredImageWithRadius:(CGFloat)radius iterations:(NSUInteger)iterations tintColor:(UIColor *)tintColor
+- (UIImage *)blurredImageWithRadius:(CGFloat)radius iterations:(NSUInteger)iterations tintColor:(UIColor *)tintColor blendMode:(CGBlendMode)blendMode
 {
     //image must be nonzero size
     if (floorf(self.size.width) * floorf(self.size.height) <= 0.0f) return self;
@@ -102,7 +102,7 @@
     if (tintColor && CGColorGetAlpha(tintColor.CGColor) > 0.0f)
     {
         CGContextSetFillColorWithColor(ctx, [tintColor colorWithAlphaComponent:0.25].CGColor);
-        CGContextSetBlendMode(ctx, kCGBlendModePlusLighter);
+        CGContextSetBlendMode(ctx, blendMode);
         CGContextFillRect(ctx, CGRectMake(0, 0, buffer1.width, buffer1.height));
     }
     
@@ -308,6 +308,7 @@
     if (!_blurRadiusSet) [self blurLayer].blurRadius = 40;
     if (!_dynamicSet) _dynamic = YES;
     if (!_blurEnabledSet) _blurEnabled = YES;
+    _tintBlendMode = kCGBlendModePlusLighter;
     self.updateInterval = _updateInterval;
     self.layer.magnificationFilter = @"linear"; // kCAFilterLinear
     
@@ -572,7 +573,8 @@
 {
     return [snapshot blurredImageWithRadius:blurRadius
                                  iterations:self.iterations
-                                  tintColor:self.tintColor];
+                                  tintColor:self.tintColor
+                                  blendMode:self.tintBlendMode];
 }
 
 - (void)setLayerContents:(UIImage *)image
